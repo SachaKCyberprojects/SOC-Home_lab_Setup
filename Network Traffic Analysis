@@ -1,0 +1,103 @@
+Network_Traffic_Analysis
+
+# Project 2 — Network Traffic Analysis with Wireshark
+## Overview
+Network traffic capture and analysis project using Wireshark on Ubuntu 24.04 LTS. 
+Traffic was captured between two virtual machines in a controlled SOC home lab 
+environment. Four key traffic types were captured and analysed, each representing 
+real world scenarios a SOC analyst would investigate.
+
+## Environment
+- **Analyst Machine:** Ubuntu 24.04 LTS VM (192.168.56.101)
+- **Target Machine:** Windows 10 Pro VM (192.168.56.102)
+- **Network:** Host-only virtual network
+- **Tools Used:** Wireshark, Nmap, curl, ping, nslookup
+
+## Captures
+
+### 1. ICMP — Ping Traffic (1-ICMP-Ping-Capture.pcap)
+**Command used:**
+ping -c 10 192.168.56.102
+
+**What was captured:**
+ICMP Echo Request and Echo Reply packets between the Ubuntu and Windows VMs.
+
+**SOC Relevance:**
+ICMP traffic is commonly used by attackers for network reconnaissance and host 
+discovery. A sudden increase in ICMP traffic can indicate a ping sweep across 
+a network, which would trigger an alert in a real SOC environment.
+
+---
+
+### 2. TCP — Nmap Port Scan (2-Nmap-Portscan-Capture.pcap)
+**Command used:**
+nmap -Pn 192.168.56.102
+
+**Open ports discovered:**
+- Port 135 — Windows RPC (Remote Procedure Call)
+- Port 139 — NetBIOS
+- Port 445 — SMB (Server Message Block)
+
+**What was captured:**
+A flood of TCP SYN packets sent by Nmap probing every port on the Windows VM.
+
+**SOC Relevance:**
+Port scanning is one of the most common early stage attack techniques. Port 445 
+(SMB) is particularly significant as it was exploited in the WannaCry ransomware 
+attack. Detecting this traffic pattern in a SIEM would indicate active 
+reconnaissance on the network.
+
+---
+
+### 3. DNS — Domain Name Resolution (3-DNS-Capture.pcap)
+**Command used:**
+nslookup google.com 8.8.8.8
+
+**What was captured:**
+DNS query sent to Google's public DNS server (8.8.8.8) and the response 
+resolving google.com to its IP address over UDP port 53.
+
+**SOC Relevance:**
+DNS traffic is critical to monitor in a SOC environment. Malware frequently 
+uses DNS to communicate with command and control servers. Unusual DNS queries 
+to unknown or suspicious domains are a key indicator of compromise.
+
+---
+
+### 4. HTTP — Unencrypted Web Traffic (4-HTTP-Capture.pcap)
+**Command used:**
+curl http://example.com
+
+**What was captured:**
+Full HTTP GET request and server response including headers, host information 
+and response data over port 80.
+
+**SOC Relevance:**
+Unencrypted HTTP traffic exposes sensitive data including credentials and 
+session tokens. In a real SOC environment any sensitive data transmitted over 
+HTTP instead of HTTPS would be flagged as a security risk.
+
+---
+
+## Key Findings
+- Successfully identified and analysed four major traffic types
+- Discovered three open ports on Windows VM including high risk SMB port 445
+- Demonstrated how DNS queries can be monitored for suspicious activity
+- Identified the security risks of unencrypted HTTP traffic
+
+## Skills Demonstrated
+- Network packet capture and analysis with Wireshark
+- Display filters for isolating specific traffic types
+- Network reconnaissance with Nmap
+- Understanding of TCP/IP protocols and their security implications
+- Identifying indicators of compromise in network traffic
+
+## Tools Used
+- Wireshark — packet capture and analysis
+- Nmap — network scanning and port enumeration
+- curl — HTTP traffic generation
+- nslookup — DNS query tool
+- ping — ICMP traffic generation
+
+## Next Project
+Project 3 — SIEM Deployment with Splunk/Elastic Stack
